@@ -1,0 +1,70 @@
+# Ambientes virtuais
+venv/
+env/
+ENV/
+.env
+.venv
+env.bak/
+venv.bak/
+
+# Arquivos Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Diretório de datasets gerados
+datasets/
+
+# Arquivos de log
+*.log
+
+# Arquivos temporários de editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Arquivos de configuração local
+*.ini
+*.cfg
+config.py
+settings.py
+# Exceto o arquivo base de configuração se existir
+!config.example.py
+!settings.example.py
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Arquivos de cache ou temporários
+.coverage
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.coverage.*
