@@ -49,7 +49,7 @@ class ExtratorCombinado:
         
         # Extrair via scraping se aplicável
         if self.scraper:
-            print("\n===== EXTRAÇÃO VIA SCRAPING DIRETO =====")
+            print("\n[COMBINADO] Iniciando extração via scraping...")
             df_scraping = self.scraper.executar_extracao()
             
             if not df_scraping.empty:
@@ -57,13 +57,13 @@ class ExtratorCombinado:
                 df_scraping['metodo_extracao'] = 'scraping'
                 dfs.append(df_scraping)
                 
-                print(f"Extraídas {len(df_scraping)} notícias via scraping direto.")
+                print(f"[COMBINADO] Scraping: {len(df_scraping)} notícias")
             else:
-                print("Nenhuma notícia extraída via scraping.")
+                print("[COMBINADO] Scraping: nenhuma notícia extraída")
         
         # Extrair via API/RSS se aplicável
         if self.api_extractor:
-            print("\n===== EXTRAÇÃO VIA API/RSS =====")
+            print("\n[COMBINADO] Iniciando extração via API/RSS...")
             df_api = self.api_extractor.executar_extracao()
             
             if not df_api.empty:
@@ -71,9 +71,9 @@ class ExtratorCombinado:
                 df_api['metodo_extracao'] = 'api/rss'
                 dfs.append(df_api)
                 
-                print(f"Extraídas {len(df_api)} notícias via API/RSS.")
+                print(f"[COMBINADO] API/RSS: {len(df_api)} notícias")
             else:
-                print("Nenhuma notícia extraída via API/RSS.")
+                print("[COMBINADO] API/RSS: nenhuma notícia extraída")
         
         # Combinar os DataFrames, se houver mais de um
         if len(dfs) > 1:
@@ -82,7 +82,7 @@ class ExtratorCombinado:
             
             # Se houver colunas incompatíveis, usar apenas as comuns
             if len(colunas_comuns) < len(dfs[0].columns) or len(colunas_comuns) < len(dfs[1].columns):
-                print(f"Aviso: Alguns campos são incompatíveis entre os métodos. Usando apenas {len(colunas_comuns)} colunas comuns.")
+                print(f"[COMBINADO] Ajustando colunas incompatíveis ({len(colunas_comuns)} colunas comuns)")
                 dfs = [df[list(colunas_comuns)] for df in dfs]
             
             # Concatenar os DataFrames
@@ -94,7 +94,7 @@ class ExtratorCombinado:
             # Verificar quantas duplicatas foram removidas
             num_duplicatas = len(df_combinado) - len(df_combinado_sem_duplicatas)
             if num_duplicatas > 0:
-                print(f"Removidas {num_duplicatas} notícias duplicadas.")
+                print(f"[COMBINADO] Removidas {num_duplicatas} notícias duplicadas")
             
             return df_combinado_sem_duplicatas
         
@@ -104,7 +104,7 @@ class ExtratorCombinado:
         
         # Se não houver nenhum DataFrame, retornar um vazio
         else:
-            print("Nenhum dado extraído por qualquer método.")
+            print("[COMBINADO] Nenhum dado extraído")
             return pd.DataFrame()
     
     def salvar_dataset(self, df, formato='csv'):
@@ -114,6 +114,58 @@ class ExtratorCombinado:
         Parâmetros:
         df (DataFrame): DataFrame com os dados
         formato (str): Formato de saída ('csv' ou 'json')
+        
+        Retorna:
+        str: Caminho do arquivo salvo
+        """
+        if df.empty:
+            print("[COMBINADO] Dataset vazio. Nada para salvar.")
+            return None
+        
+        # Criar pasta 'datasets' se não existir
+        if not os.path.exists('datasets'):
+            os.makedirs('datasets')
+        
+        # Gerar nome do arquivo com timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        if formato.lower() == 'csv':
+            filepath = f'datasets/fato_ou_fake_combinado_{timestamp}.csv'
+            df.to_csv(filepath, index=False, encoding='utf-8')
+        elif formato.lower() == 'json':
+            filepath = f'datasets/fato_ou_fake_combinado_{timestamp}.json'
+            df.to_json(filepath, orient='records', force_ascii=False, indent=4)
+        else:
+            raise ValueError(f"Formato '{formato}' não suportado. Use 'csv' ou 'json'.")
+        
+        print(f"[COMBINADO] Dataset salvo em: {filepath}")
+        return filepathída ('csv' ou 'json')
+        
+        Retorna:
+        str: Caminho do arquivo salvo
+        """
+        if df.empty:
+            print("[COMBINADO] Dataset vazio. Nada para salvar.")
+            return None
+        
+        # Criar pasta 'datasets' se não existir
+        if not os.path.exists('datasets'):
+            os.makedirs('datasets')
+        
+        # Gerar nome do arquivo com timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        if formato.lower() == 'csv':
+            filepath = f'datasets/fato_ou_fake_combinado_{timestamp}.csv'
+            df.to_csv(filepath, index=False, encoding='utf-8')
+        elif formato.lower() == 'json':
+            filepath = f'datasets/fato_ou_fake_combinado_{timestamp}.json'
+            df.to_json(filepath, orient='records', force_ascii=False, indent=4)
+        else:
+            raise ValueError(f"Formato '{formato}' não suportado. Use 'csv' ou 'json'.")
+        
+        print(f"[COMBINADO] Dataset salvo em: {filepath}")
+        return filepathída ('csv' ou 'json')
         
         Retorna:
         str: Caminho do arquivo salvo

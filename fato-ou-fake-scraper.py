@@ -143,36 +143,65 @@ class FatoOuFakeScraper:
         
         Parâmetros:
         titulo (str): Título da notícia
-        resumo (str): Resumo da notícia
+        resumo (str): Resumo da notícia (não utilizado na classificação)
         
         Retorna:
         str: 'FATO', 'FAKE' ou 'INDETERMINADO'
         """
-        texto_completo = (titulo + " " + resumo).lower()
+        # Considerar apenas o título para a classificação
+        texto_titulo = titulo.lower()
         
-        # Padrões para classificar como FAKE
+        # Padrões comuns usados pelo G1 para indicar FAKE no título
         padroes_fake = [
-            'é fake', 'é falso', 'não é verdade', 'falso que', 'fake news',
-            'boato', 'mentira', 'enganoso', 'não é real', 'não aconteceu'
+            'é fake',
+            'é falso', 
+            'não é verdade', 
+            'não é verdadeiro',
+            'falso que', 
+            'fake news',
+            'boato', 
+            'mentira', 
+            'enganoso', 
+            'não é real', 
+            'não aconteceu',
+            'não procede',
+            'não existe',
+            'não é fato'
         ]
         
-        # Padrões para classificar como FATO
+        # Padrões comuns usados pelo G1 para indicar FATO no título
         padroes_fato = [
-            'é fato', 'é verdade', 'verdadeiro', 'aconteceu', 'é real',
-            'confirmado', 'verificado', 'comprovado'
+            'é fato', 
+            'é verdade', 
+            'verdadeiro', 
+            'aconteceu', 
+            'é real',
+            'confirmado', 
+            'verificado', 
+            'comprovado',
+            'procede',
+            'é verdadeiro'
         ]
         
         # Verificar se é FAKE
         for padrao in padroes_fake:
-            if padrao in texto_completo:
+            if padrao in texto_titulo:
                 return 'FAKE'
         
         # Verificar se é FATO
         for padrao in padroes_fato:
-            if padrao in texto_completo:
+            if padrao in texto_titulo:
                 return 'FATO'
         
-        # Se não foi possível determinar
+        # Verificar se é FAKE com base em apenas "fake" isolado
+        if re.search(r'\bfake\b', texto_titulo, re.IGNORECASE):
+            return 'FAKE'
+            
+        # Verificar se é FATO com base em apenas "fato" isolado
+        if re.search(r'\bfato\b', texto_titulo, re.IGNORECASE):
+            return 'FATO'
+        
+        # Se não foi possível determinar com certeza
         return 'INDETERMINADO'
     
     def _extrair_detalhes_noticia(self, url):
@@ -224,12 +253,14 @@ class FatoOuFakeScraper:
         """
         todas_noticias = []
         
+        print(f"[SCRAPER] Iniciando extração em {self.num_pages} páginas...")
+        
         # Primeira página (principal)
         soup_primeira_pagina = self.extrair_pagina(self.base_url)
         if soup_primeira_pagina:
             noticias_pagina = self.extrair_noticias_da_pagina(soup_primeira_pagina)
             todas_noticias.extend(noticias_pagina)
-            print(f"Extraídas {len(noticias_pagina)} notícias da página principal")
+            print(f"[SCRAPER] Página 1: {len(noticias_pagina)} notícias extraídas")
         
         # Percorrer páginas adicionais (se houver paginação)
         for i in range(2, self.num_pages + 1):
@@ -241,9 +272,9 @@ class FatoOuFakeScraper:
             if soup_pagina:
                 noticias_pagina = self.extrair_noticias_da_pagina(soup_pagina)
                 todas_noticias.extend(noticias_pagina)
-                print(f"Extraídas {len(noticias_pagina)} notícias da página {i}")
+                print(f"[SCRAPER] Página {i}: {len(noticias_pagina)} notícias extraídas")
             else:
-                print(f"Não foi possível acessar a página {i}")
+                print(f"[SCRAPER] Falha ao acessar página {i}")
                 break
         
         return todas_noticias
@@ -255,11 +286,11 @@ class FatoOuFakeScraper:
         Retorna:
         DataFrame: DataFrame pandas com todas as notícias extraídas
         """
-        print(f"Iniciando extração de notícias Fato ou Fake do G1...")
+        print(f"[SCRAPER] Extração iniciada")
         
         # Extrair notícias de todas as páginas
         self.dataset = self.percorrer_paginas()
-        print(f"Total de {len(self.dataset)} notícias extraídas com sucesso.")
+        print(f"[SCRAPER] Concluído. Total: {len(self.dataset)} notícias extraídas")
         
         # Converter para DataFrame
         df = pd.DataFrame(self.dataset)
@@ -293,7 +324,7 @@ class FatoOuFakeScraper:
         else:
             raise ValueError(f"Formato '{formato}' não suportado. Use 'csv' ou 'json'.")
         
-        print(f"Dataset salvo com sucesso em {filepath}")
+        print(f"[SCRAPER] Dataset salvo em: {filepath}")
         return filepath
 
 

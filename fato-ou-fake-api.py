@@ -94,6 +94,7 @@ class FatoOuFakeAPIExtractor:
             
             # Verificar se o feed foi processado com sucesso
             if feed.status == 200 and feed.entries:
+                print("Connectado ao feed RSS iniciando processamento...")
                 noticias = []
                 
                 for entry in feed.entries:
@@ -195,36 +196,65 @@ class FatoOuFakeAPIExtractor:
         
         Parâmetros:
         titulo (str): Título da notícia
-        resumo (str): Resumo da notícia
+        resumo (str): Resumo da notícia (não utilizado na classificação)
         
         Retorna:
         str: 'FATO', 'FAKE' ou 'INDETERMINADO'
         """
-        texto_completo = (titulo + " " + resumo).lower()
+        # Considerar apenas o título para a classificação
+        texto_titulo = titulo.lower()
         
-        # Padrões para classificar como FAKE
+        # Padrões comuns usados pelo G1 para indicar FAKE no título
         padroes_fake = [
-            'é fake', 'é falso', 'não é verdade', 'falso que', 'fake news',
-            'boato', 'mentira', 'enganoso', 'não é real', 'não aconteceu'
+            'é fake',
+            'é falso', 
+            'não é verdade', 
+            'não é verdadeiro',
+            'falso que', 
+            'fake news',
+            'boato', 
+            'mentira', 
+            'enganoso', 
+            'não é real', 
+            'não aconteceu',
+            'não procede',
+            'não existe',
+            'não é fato'
         ]
         
-        # Padrões para classificar como FATO
+        # Padrões comuns usados pelo G1 para indicar FATO no título
         padroes_fato = [
-            'é fato', 'é verdade', 'verdadeiro', 'aconteceu', 'é real',
-            'confirmado', 'verificado', 'comprovado'
+            'é fato', 
+            'é verdade', 
+            'verdadeiro', 
+            'aconteceu', 
+            'é real',
+            'confirmado', 
+            'verificado', 
+            'comprovado',
+            'procede',
+            'é verdadeiro'
         ]
         
         # Verificar se é FAKE
         for padrao in padroes_fake:
-            if padrao in texto_completo:
+            if padrao in texto_titulo:
                 return 'FAKE'
         
         # Verificar se é FATO
         for padrao in padroes_fato:
-            if padrao in texto_completo:
+            if padrao in texto_titulo:
                 return 'FATO'
         
-        # Se não foi possível determinar
+        # Verificar se é FAKE com base em apenas "fake" isolado
+        if re.search(r'\bfake\b', texto_titulo, re.IGNORECASE):
+            return 'FAKE'
+            
+        # Verificar se é FATO com base em apenas "fato" isolado
+        if re.search(r'\bfato\b', texto_titulo, re.IGNORECASE):
+            return 'FATO'
+        
+        # Se não foi possível determinar com certeza
         return 'INDETERMINADO'
     
     def _classificar_checagem_api(self, item):
