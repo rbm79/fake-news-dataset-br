@@ -139,58 +139,6 @@ class ExtratorCombinado:
             raise ValueError(f"Formato '{formato}' não suportado. Use 'csv' ou 'json'.")
         
         print(f"[COMBINADO] Dataset salvo em: {filepath}")
-        return filepathída ('csv' ou 'json')
-        
-        Retorna:
-        str: Caminho do arquivo salvo
-        """
-        if df.empty:
-            print("[COMBINADO] Dataset vazio. Nada para salvar.")
-            return None
-        
-        # Criar pasta 'datasets' se não existir
-        if not os.path.exists('datasets'):
-            os.makedirs('datasets')
-        
-        # Gerar nome do arquivo com timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        
-        if formato.lower() == 'csv':
-            filepath = f'datasets/fato_ou_fake_combinado_{timestamp}.csv'
-            df.to_csv(filepath, index=False, encoding='utf-8')
-        elif formato.lower() == 'json':
-            filepath = f'datasets/fato_ou_fake_combinado_{timestamp}.json'
-            df.to_json(filepath, orient='records', force_ascii=False, indent=4)
-        else:
-            raise ValueError(f"Formato '{formato}' não suportado. Use 'csv' ou 'json'.")
-        
-        print(f"[COMBINADO] Dataset salvo em: {filepath}")
-        return filepathída ('csv' ou 'json')
-        
-        Retorna:
-        str: Caminho do arquivo salvo
-        """
-        if df.empty:
-            print("Dataset vazio. Nada para salvar.")
-            return None
-        
-        # Criar pasta 'datasets' se não existir
-        if not os.path.exists('datasets'):
-            os.makedirs('datasets')
-        
-        # Gerar nome do arquivo com timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        
-        if formato.lower() == 'csv':
-            filepath = f'datasets/fato_ou_fake_combinado_{timestamp}.csv'
-            df.to_csv(filepath, index=False, encoding='utf-8')
-        elif formato.lower() == 'json':
-            filepath = f'datasets/fato_ou_fake_combinado_{timestamp}.json'
-            df.to_json(filepath, orient='records', force_ascii=False, indent=4)
-        else:
-            raise ValueError(f"Formato '{formato}' não suportado. Use 'csv' ou 'json'.")
-        
-        print(f"Dataset combinado salvo com sucesso em {filepath}")
         return filepath
 
 
